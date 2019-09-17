@@ -63,6 +63,18 @@ func (led Ledger) Transactions() []Transaction {
 	return []Transaction(led.trns)
 }
 
+// Do calls the given function on each transaction in the ledger, in order. If
+// any of the calls return an error, Do will return that error immediately.
+func (led Ledger) Do(f func(trn Transaction) error) error {
+	for _, trn := range led.trns {
+		err := f(trn)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // TransactionsOf will return a slice of transactions in the ledger involving an
 // account given its public key.
 func (led Ledger) TransactionsOf(pubkey PublicKey) []Transaction {
