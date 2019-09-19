@@ -1,9 +1,8 @@
 package coin
 
 import (
+	"crypto/ed25519"
 	"encoding/binary"
-
-	"golang.org/x/crypto/ed25519"
 )
 
 // PublicKey is a public key and address of an account.

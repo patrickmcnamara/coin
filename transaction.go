@@ -2,9 +2,8 @@ package coin
 
 import (
 	"bytes"
+	"crypto/ed25519"
 	"errors"
-
-	"golang.org/x/crypto/ed25519"
 )
 
 // Transaction is a coin transaction. An amount of coin is sent from one account

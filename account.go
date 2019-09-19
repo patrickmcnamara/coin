@@ -2,9 +2,8 @@ package coin
 
 import (
 	"bytes"
-
-	"golang.org/x/crypto/blake2b"
-	"golang.org/x/crypto/ed25519"
+	"crypto/ed25519"
+	"errors"
 )
 
 // Account is a coin account. It can make transactions on a ledger. It has a
@@ -27,13 +26,15 @@ func NewAccount() Account {
 
 // NewAccountFromSeed returns a new account with a public and private key
 // generated from a given seed.
-func NewAccountFromSeed(seed []byte) Account {
-	hash := blake2b.Sum512(seed)
-	pubKey, prvKey, _ := ed25519.GenerateKey(bytes.NewBuffer(hash[:]))
+func NewAccountFromSeed(seed []byte) (Account, error) {
+	if len(seed) < 32 {
+		return Account{}, errors.New("seed must have a length greater than 32")
+	}
+	pubKey, prvKey, _ := ed25519.GenerateKey(bytes.NewBuffer(seed))
 	return Account{
 		PublicKey:  publicKeyConv(pubKey),
 		PrivateKey: privateKeyConv(prvKey),
-	}
+	}, nil
 }
 
 // Sign signs data with the private key of the account.
