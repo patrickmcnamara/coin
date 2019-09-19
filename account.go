@@ -3,7 +3,6 @@ package coin
 import (
 	"bytes"
 	"crypto/ed25519"
-	"errors"
 )
 
 // Account is a coin account. It can make transactions on a ledger. It has a
@@ -28,7 +27,7 @@ func NewAccount() Account {
 // generated from a given seed.
 func NewAccountFromSeed(seed []byte) (Account, error) {
 	if len(seed) < 32 {
-		return Account{}, errors.New("seed must have a length greater than 32")
+		return Account{}, ErrAccShortSeed
 	}
 	pubKey, prvKey, _ := ed25519.GenerateKey(bytes.NewBuffer(seed))
 	return Account{

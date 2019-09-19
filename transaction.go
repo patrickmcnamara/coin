@@ -3,7 +3,6 @@ package coin
 import (
 	"bytes"
 	"crypto/ed25519"
-	"errors"
 )
 
 // Transaction is a coin transaction. An amount of coin is sent from one account
@@ -27,20 +26,20 @@ func (trn Transaction) Verify(ledSig Signature) bool {
 	return ed25519.Verify(trn.From[:], trn.Contract(ledSig), trn.Signature[:])
 }
 
-// Check returns an error if the transaction is not valid to add. Otherwise,
-// it returns nil.
+// Check returns an error if the transaction is not valid to add to the given
+// ledger.
 func (trn Transaction) Check(led Ledger) error {
 	if trn.Amount == 0 {
-		return errors.New("check transaction: invalid amount, must be greater than zero")
+		return ErrTrnAmountZero
 	}
 	if bytes.Equal(trn.From[:], trn.To[:]) {
-		return errors.New("check transaction: invalid receiver, sender and receiver must not be the same")
+		return ErrTrnSameReceiver
 	}
 	if trn.Amount > led.BalanceOf(trn.From) {
-		return errors.New("check transaction: invalid amount, must be less than or equal to balance of sender")
+		return ErrTrnAmountBalance
 	}
 	if !trn.Verify(led.Signature()) {
-		return errors.New("check transaction: invalid signature, must be signed by private key of sender")
+		return ErrTrnBadSignature
 	}
 	return nil
 }

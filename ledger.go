@@ -1,9 +1,6 @@
 package coin
 
-import (
-	"bytes"
-	"errors"
-)
+import "bytes"
 
 // Ledger is a list of transactions.
 type Ledger struct {
@@ -19,7 +16,7 @@ func NewLedger() Ledger {
 // genesis transaction is valid as the first transaction of the ledger.
 func (led *Ledger) AddGenesisTransaction(trn Transaction) error {
 	if len(led.trns) > 0 {
-		return errors.New("add genesis transaction: genesis transaction already in ledger")
+		return ErrLedAlreadyGenesis
 	}
 	led.trns = append(led.trns, trn)
 	return nil
@@ -29,7 +26,7 @@ func (led *Ledger) AddGenesisTransaction(trn Transaction) error {
 // if it is.
 func (led *Ledger) AddTransaction(trn Transaction) error {
 	if len(led.trns) == 0 {
-		return errors.New("add transaction: no genesis transaction in ledger")
+		return ErrLedNoGenesis
 	}
 	if err := trn.Check(*led); err != nil {
 		return err
