@@ -1,5 +1,10 @@
 # Coin
 
+![latest version](https://img.shields.io/github/v/tag/patrickmcnamara/coin?label=latest%20version)
+![last commit](https://img.shields.io/github/last-commit/patrickmcnamara/coin)
+![top language](https://img.shields.io/github/languages/top/patrickmcnamara/coin)
+![licence](https://img.shields.io/github/license/patrickmcnamara/coin?label=licence)
+
 This is a basic cryptocurrency library, made for fun.
 It has no networking capabilities.
 It has no consensus mechanism.
@@ -28,3 +33,11 @@ The sending account grants itself an amount of coin. This is the first transacti
 A list of transactions.
 A genesis transaction is first before all other transactions and there is only one.
 Transactions are verified when they are added.
+
+## Installation
+
+Run `go get -u github.com/patrickmcnamara/coin`.
+
+## Licence
+
+This project is licenced under the European Union Public Licence v1.2.
