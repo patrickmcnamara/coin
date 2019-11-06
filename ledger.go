@@ -8,8 +8,10 @@ type Ledger struct {
 }
 
 // NewLedger returns a new, empty ledger.
+//
+// You could also simply declare a Ledger instead.
 func NewLedger() Ledger {
-	return Ledger{make([]Transaction, 0)}
+	return Ledger{}
 }
 
 // AddGenesisTransaction adds a genesis transaction to the ledger. Only a
@@ -75,7 +77,7 @@ func (led Ledger) Do(f func(trn Transaction) error) error {
 // TransactionsOf will return a slice of transactions in the ledger involving an
 // account given its public key.
 func (led Ledger) TransactionsOf(pubkey PublicKey) []Transaction {
-	trns := make([]Transaction, 0)
+	var trns []Transaction
 	for _, trn := range led.trns {
 		if bytes.Equal(trn.From[:], pubkey[:]) || bytes.Equal(trn.To[:], pubkey[:]) {
 			trns = append(trns, trn)
