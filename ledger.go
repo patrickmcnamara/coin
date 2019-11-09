@@ -59,7 +59,9 @@ func (led Ledger) Verify() bool {
 
 // Transactions returns all transactions in the ledger.
 func (led Ledger) Transactions() []Transaction {
-	return []Transaction(led.trns)
+	trns := make([]Transaction, len(led.trns))
+	copy(trns, led.trns)
+	return trns
 }
 
 // Do calls the given function on each transaction in the ledger, in order. If
