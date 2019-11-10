@@ -1,54 +1,78 @@
 package coin
 
-import "bytes"
+import (
+	"bytes"
+)
 
 // Ledger is a list of transactions.
 type Ledger struct {
 	trns []Transaction
+	bals map[PublicKey]uint32
 }
 
 // NewLedger returns a new, empty ledger.
-//
-// You could also simply declare a Ledger instead.
 func NewLedger() Ledger {
-	return Ledger{}
+	return Ledger{bals: make(map[PublicKey]uint32)}
 }
 
 // AddGenesisTransaction adds a genesis transaction to the ledger. Only a
 // genesis transaction is valid as the first transaction of the ledger.
 func (led *Ledger) AddGenesisTransaction(trn Transaction) error {
+	// ledger should not have a genesis transaction
 	if len(led.trns) > 0 {
 		return ErrLedAlreadyGenesis
 	}
+
+	// amount must not be zero
 	if trn.Amount == 0 {
 		return ErrTrnAmountZero
 	}
+
+	// signature must be ok
 	if !trn.Verify(led.Signature()) {
 		return ErrTrnBadSignature
 	}
+
+	// update internal state
 	led.trns = append(led.trns, trn)
+	led.bals[trn.To] += trn.Amount
+
 	return nil
 }
 
 // AddTransaction verifies that a transaction is valid and adds it to the ledger
 // if it is.
 func (led *Ledger) AddTransaction(trn Transaction) error {
+	// ledger should have a genesis transaction
 	if len(led.trns) == 0 {
 		return ErrLedNoGenesis
 	}
+
+	// amount must not be zero
 	if trn.Amount == 0 {
 		return ErrTrnAmountZero
 	}
+
+	// sender and receiver must not be the same
 	if bytes.Equal(trn.From[:], trn.To[:]) {
 		return ErrTrnSameReceiver
 	}
+
+	// sender must have enough coin
 	if trn.Amount > led.BalanceOf(trn.From) {
 		return ErrTrnAmountBalance
 	}
+
+	// signature must be ok
 	if !trn.Verify(led.Signature()) {
 		return ErrTrnBadSignature
 	}
+
+	// update internal state
 	led.trns = append(led.trns, trn)
+	led.bals[trn.To] += trn.Amount
+	led.bals[trn.From] -= trn.Amount
+
 	return nil
 }
 
@@ -91,21 +115,29 @@ func (led Ledger) TransactionsOf(pubkey PublicKey) []Transaction {
 
 // GenesisTransaction returns the first transaction of the ledger.
 func (led Ledger) GenesisTransaction() (trn Transaction, err error) {
+	// genesis transaction must exist
 	if len(led.trns) == 0 {
 		err = ErrLedNoGenesis
 		return
 	}
+
+	// genesis transaction
 	trn = led.trns[0]
+
 	return
 }
 
 // LatestTransaction returns the latest transaction of the ledger.
 func (led Ledger) LatestTransaction() (trn Transaction, err error) {
+	// genesis transaction must exist
 	if len(led.trns) == 0 {
 		err = ErrLedNoGenesis
 		return
 	}
+
+	// latest transaction
 	trn = led.trns[len(led.trns)-1]
+
 	return
 }
 
@@ -113,11 +145,8 @@ func (led Ledger) LatestTransaction() (trn Transaction, err error) {
 // the accounts associated with those public keys.
 func (led Ledger) Balances() map[PublicKey]uint32 {
 	bals := make(map[PublicKey]uint32)
-	for i, trn := range led.trns {
-		bals[trn.To] += trn.Amount
-		if i != 0 {
-			bals[trn.From] -= trn.Amount
-		}
+	for pubKey, amt := range led.bals {
+		bals[pubKey] = amt
 	}
 	return bals
 }
@@ -125,15 +154,7 @@ func (led Ledger) Balances() map[PublicKey]uint32 {
 // BalanceOf returns the balance of an account in the ledger given its public
 // key. If the account is not in the ledger, it will return 0.
 func (led Ledger) BalanceOf(pubKey PublicKey) uint32 {
-	var bal uint32
-	for _, trn := range led.trns {
-		if bytes.Equal(trn.To[:], pubKey[:]) {
-			bal += trn.Amount
-		} else if bytes.Equal(trn.From[:], pubKey[:]) {
-			bal -= trn.Amount
-		}
-	}
-	return bal
+	return led.bals[pubKey]
 }
 
 // Size returns the number of transactions in the ledger.
