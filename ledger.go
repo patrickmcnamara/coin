@@ -69,8 +69,7 @@ func (led Ledger) Transactions() []Transaction {
 // any of the calls return an error, Do will return that error immediately.
 func (led Ledger) Do(f func(trn Transaction) error) error {
 	for _, trn := range led.trns {
-		err := f(trn)
-		if err != nil {
+		if err := f(trn); err != nil {
 			return err
 		}
 	}
