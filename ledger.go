@@ -44,20 +44,6 @@ func (led Ledger) Signature() Signature {
 	return trn.Signature
 }
 
-// Verify verifies the signature of every transaction in the ledger, thus
-// checking if the ledger is valid. This is only required when importing a
-// ledger as transactions are verified as they are added to the ledger.
-func (led Ledger) Verify() bool {
-	var currSig Signature
-	for _, trn := range led.trns {
-		if !trn.Verify(currSig) {
-			return false
-		}
-		currSig = trn.Signature
-	}
-	return true
-}
-
 // Transactions returns all transactions in the ledger.
 func (led Ledger) Transactions() []Transaction {
 	trns := make([]Transaction, len(led.trns))
