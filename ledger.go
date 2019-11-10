@@ -40,7 +40,8 @@ func (led *Ledger) AddTransaction(trn Transaction) error {
 // Signature returns the current signature of the ledger. This is the signature
 // of the latest transaction.
 func (led Ledger) Signature() Signature {
-	return led.LatestTransaction().Signature
+	trn, _ := led.LatestTransaction()
+	return trn.Signature
 }
 
 // Verify verifies the signature of every transaction in the ledger, thus
@@ -89,19 +90,23 @@ func (led Ledger) TransactionsOf(pubkey PublicKey) []Transaction {
 }
 
 // GenesisTransaction returns the first transaction of the ledger.
-func (led Ledger) GenesisTransaction() Transaction {
+func (led Ledger) GenesisTransaction() (trn Transaction, err error) {
 	if len(led.trns) == 0 {
-		return Transaction{}
+		err = ErrLedNoGenesis
+		return
 	}
-	return led.trns[0]
+	trn = led.trns[0]
+	return
 }
 
 // LatestTransaction returns the latest transaction of the ledger.
-func (led Ledger) LatestTransaction() Transaction {
+func (led Ledger) LatestTransaction() (trn Transaction, err error) {
 	if len(led.trns) == 0 {
-		return Transaction{}
+		err = ErrLedNoGenesis
+		return
 	}
-	return led.trns[len(led.trns)-1]
+	trn = led.trns[len(led.trns)-1]
+	return
 }
 
 // Balances returns a map of every public key in the ledger and the balances of
