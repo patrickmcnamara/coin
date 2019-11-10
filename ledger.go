@@ -20,6 +20,12 @@ func (led *Ledger) AddGenesisTransaction(trn Transaction) error {
 	if len(led.trns) > 0 {
 		return ErrLedAlreadyGenesis
 	}
+	if trn.Amount == 0 {
+		return ErrTrnAmountZero
+	}
+	if !trn.Verify(led.Signature()) {
+		return ErrTrnBadSignature
+	}
 	led.trns = append(led.trns, trn)
 	return nil
 }
@@ -30,8 +36,17 @@ func (led *Ledger) AddTransaction(trn Transaction) error {
 	if len(led.trns) == 0 {
 		return ErrLedNoGenesis
 	}
-	if err := trn.Check(*led); err != nil {
-		return err
+	if trn.Amount == 0 {
+		return ErrTrnAmountZero
+	}
+	if bytes.Equal(trn.From[:], trn.To[:]) {
+		return ErrTrnSameReceiver
+	}
+	if trn.Amount > led.BalanceOf(trn.From) {
+		return ErrTrnAmountBalance
+	}
+	if !trn.Verify(led.Signature()) {
+		return ErrTrnBadSignature
 	}
 	led.trns = append(led.trns, trn)
 	return nil

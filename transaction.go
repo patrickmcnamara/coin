@@ -26,24 +26,6 @@ func (trn Transaction) Verify(ledSig Signature) bool {
 	return ed25519.Verify(trn.From[:], trn.Contract(ledSig), trn.Signature[:])
 }
 
-// Check returns an error if the transaction is not valid to add to the given
-// ledger.
-func (trn Transaction) Check(led Ledger) error {
-	if trn.Amount == 0 {
-		return ErrTrnAmountZero
-	}
-	if bytes.Equal(trn.From[:], trn.To[:]) {
-		return ErrTrnSameReceiver
-	}
-	if trn.Amount > led.BalanceOf(trn.From) {
-		return ErrTrnAmountBalance
-	}
-	if !trn.Verify(led.Signature()) {
-		return ErrTrnBadSignature
-	}
-	return nil
-}
-
 // Contract returns the bytes that account signs to create a transaction with
 // the private key.
 func (trn Transaction) Contract(ledSig Signature) []byte {
