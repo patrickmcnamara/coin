@@ -3,7 +3,7 @@
 ![latest version](https://img.shields.io/github/v/tag/patrickmcnamara/coin?label=latest%20version)
 ![last commit](https://img.shields.io/github/last-commit/patrickmcnamara/coin)
 ![top language](https://img.shields.io/github/languages/top/patrickmcnamara/coin)
-![licence](https://img.shields.io/github/license/patrickmcnamara/coin?label=licence)
+![license](https://img.shields.io/github/license/patrickmcnamara/coin?label=license)
 
 This is a basic cryptocurrency library, made for fun.
 It has no networking capabilities.
@@ -38,6 +38,6 @@ Transactions are verified when they are added.
 
 Run `go get -u github.com/patrickmcnamara/coin`.
 
-## Licence
+## License
 
-This project is licenced under the European Union Public Licence v1.2.
+This project is licensed under the GNU Lesser General Public License v3.0.
