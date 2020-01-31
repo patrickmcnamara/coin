@@ -8,10 +8,10 @@ import (
 // Transaction is a coin transaction. An amount of coin is sent from one account
 // to another. The sending account signs the transaction with its private key.
 type Transaction struct {
-	From      PublicKey
-	To        PublicKey
-	Amount    uint32
-	Signature Signature
+	From      PublicKey `json:"from"`
+	To        PublicKey `json:"to"`
+	Amount    uint32    `json:"amount"`
+	Signature Signature `json:"signature"`
 }
 
 // Sign signs the transaction with the private key of the sender and the current

@@ -10,8 +10,8 @@ import (
 // which is used to sign transactions. Anyone with access to the private key
 // will have access to the account.
 type Account struct {
-	PublicKey  PublicKey
-	PrivateKey PrivateKey
+	PublicKey  PublicKey  `json:"publicKey"`
+	PrivateKey PrivateKey `json:"privateKey"`
 }
 
 // NewAccount returns a new account with a new public and private key.
