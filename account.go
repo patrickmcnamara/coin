@@ -15,30 +15,32 @@ type Account struct {
 }
 
 // NewAccount returns a new account with a new public and private key.
-func NewAccount() Account {
-	pubKey, prvKey, _ := ed25519.GenerateKey(nil)
-	return Account{
-		PublicKey:  publicKeyConv(pubKey),
-		PrivateKey: privateKeyConv(prvKey),
-	}
+func NewAccount() (acc Account) {
+	pubKey, priKey, _ := ed25519.GenerateKey(nil)
+	copy(acc.PublicKey[:], pubKey)
+	copy(acc.PrivateKey[:], priKey)
+	return
 }
 
 // NewAccountFromSeed returns a new account with a public and private key
 // generated from a given seed.
-func NewAccountFromSeed(seed []byte) (Account, error) {
+func NewAccountFromSeed(seed []byte) (acc Account, err error) {
 	if len(seed) < 32 {
-		return Account{}, ErrAccShortSeed
+		err = ErrAccShortSeed
+		return
 	}
-	pubKey, prvKey, _ := ed25519.GenerateKey(bytes.NewBuffer(seed))
-	return Account{
-		PublicKey:  publicKeyConv(pubKey),
-		PrivateKey: privateKeyConv(prvKey),
-	}, nil
+
+	pubKey, priKey, _ := ed25519.GenerateKey(bytes.NewBuffer(seed))
+	copy(acc.PublicKey[:], pubKey)
+	copy(acc.PrivateKey[:], priKey)
+
+	return
 }
 
 // Sign signs data with the private key of the account.
-func (acc Account) Sign(data []byte) Signature {
-	return signatureConv(ed25519.Sign(acc.PrivateKey[:], data))
+func (acc Account) Sign(data []byte) (sig Signature) {
+	copy(sig[:], ed25519.Sign(acc.PrivateKey[:], data))
+	return
 }
 
 // Verify verifies signed data with the public key of the account.

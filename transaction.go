@@ -3,6 +3,7 @@ package coin
 import (
 	"bytes"
 	"crypto/ed25519"
+	"encoding/binary"
 )
 
 // Transaction is a coin transaction. An amount of coin is sent from one account
@@ -17,7 +18,7 @@ type Transaction struct {
 // Sign signs the transaction with the private key of the sender and the
 // signature of the ledger or bank.
 func (trn *Transaction) Sign(prvKey PrivateKey, ledSig Signature) {
-	trn.Signature = signatureConv(ed25519.Sign(prvKey[:], trn.Contract(ledSig)))
+	copy(trn.Signature[:], ed25519.Sign(prvKey[:], trn.Contract(ledSig)))
 }
 
 // Verify verifies the signature of the transaction with the public key of the
@@ -29,5 +30,7 @@ func (trn Transaction) Verify(ledSig Signature) bool {
 // Contract returns the bytes that account signs to create a transaction with
 // the private key.
 func (trn Transaction) Contract(ledSig Signature) []byte {
-	return bytes.Join([][]byte{trn.From[:], trn.To[:], uint32ToBytes(trn.Amount), ledSig[:]}, []byte{})
+	amount := make([]byte, 4)
+	binary.LittleEndian.PutUint32(amount, trn.Amount)
+	return bytes.Join([][]byte{trn.From[:], trn.To[:], amount, ledSig[:]}, []byte{})
 }
