@@ -6,7 +6,7 @@ import "errors"
 //
 // These indicate why an account could not be generated.
 var (
-	ErrAccShortSeed = errors.New("seed must have a length greater than 32")
+	ErrAccShortSeed = errors.New("seed must have a length of at least 32")
 )
 
 // Transaction errors
@@ -16,7 +16,7 @@ var (
 	ErrTrnAmountZero    = errors.New("amount cannot be zero")
 	ErrTrnAmountBalance = errors.New("sender balance too low")
 	ErrTrnSameReceiver  = errors.New("receiver cannot be same as sender")
-	ErrTrnBadSignature  = errors.New("signature cannot be validated")
+	ErrTrnBadSignature  = errors.New("signature invalid")
 )
 
 // Ledger errors

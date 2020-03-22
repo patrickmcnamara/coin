@@ -3,6 +3,7 @@ package coin
 import (
 	"bytes"
 	"crypto/ed25519"
+	"crypto/rand"
 )
 
 // Account is a coin account. It can make transactions on a ledger. It has a
@@ -16,20 +17,25 @@ type Account struct {
 
 // NewAccount returns a new account with a new public and private key.
 func NewAccount() (acc Account) {
-	pubKey, priKey, _ := ed25519.GenerateKey(nil)
-	copy(acc.PublicKey[:], pubKey)
-	copy(acc.PrivateKey[:], priKey)
+	// generate random seed
+	seed := make([]byte, 32)
+	rand.Read(seed)
+
+	// generate account from seed
+	acc, _ = NewAccountFromSeed(seed)
 	return
 }
 
 // NewAccountFromSeed returns a new account with a public and private key
 // generated from a given seed.
 func NewAccountFromSeed(seed []byte) (acc Account, err error) {
+	// seed must have a length of at least 32
 	if len(seed) < 32 {
 		err = ErrAccShortSeed
 		return
 	}
 
+	// generate account from seed
 	pubKey, priKey, _ := ed25519.GenerateKey(bytes.NewBuffer(seed))
 	copy(acc.PublicKey[:], pubKey)
 	copy(acc.PrivateKey[:], priKey)
@@ -51,20 +57,19 @@ func (acc Account) Verify(data []byte, sig Signature) bool {
 // NewGenesisTransaction creates a new transaction where the account grants
 // itself an amount of coin. This must be the first transaction in a ledger
 // or bank and will be invalid otherwise.
-func (acc Account) NewGenesisTransaction(amount uint32) Transaction {
-	return acc.NewTransaction(acc.PublicKey, amount, Signature{})
+func (acc Account) NewGenesisTransaction(amount uint32) (trn Transaction) {
+	trn = acc.NewTransaction(acc.PublicKey, amount, Signature{})
+	return
 }
 
 // NewTransaction creates a new transaction where an account send an amount of
 // coin to another account, addressed by their respective public keys. It is
 // signed by the private key of the sender. The signature of the ledger or bank
 // that the transaction is to be added to is also required.
-func (acc Account) NewTransaction(pubKey PublicKey, amount uint32, ledSig Signature) Transaction {
-	trn := Transaction{
-		From:   acc.PublicKey,
-		To:     pubKey,
-		Amount: amount,
-	}
-	trn.Sign(acc.PrivateKey, ledSig)
-	return trn
+func (acc Account) NewTransaction(pubKey PublicKey, amount uint32, currSig Signature) (trn Transaction) {
+	trn.To = pubKey
+	trn.From = acc.PublicKey
+	trn.Amount = amount
+	trn.Signature = trn.Sign(acc.PrivateKey, currSig)
+	return
 }

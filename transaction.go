@@ -15,22 +15,23 @@ type Transaction struct {
 	Signature Signature `json:"signature"`
 }
 
-// Sign signs the transaction with the private key of the sender and the
-// signature of the ledger or bank.
-func (trn *Transaction) Sign(prvKey PrivateKey, ledSig Signature) {
-	copy(trn.Signature[:], ed25519.Sign(prvKey[:], trn.Contract(ledSig)))
+// Sign returns the signature of a transaction given the private key of the
+// sender and the signature of the ledger or bank.
+func (trn Transaction) Sign(prvKey PrivateKey, currSig Signature) (sig Signature) {
+	copy(sig[:], ed25519.Sign(prvKey[:], trn.Contract(currSig)))
+	return
 }
 
 // Verify verifies the signature of the transaction with the public key of the
 // sender and the signature of the ledger or bank.
-func (trn Transaction) Verify(ledSig Signature) bool {
-	return ed25519.Verify(trn.From[:], trn.Contract(ledSig), trn.Signature[:])
+func (trn Transaction) Verify(currSig Signature) bool {
+	return ed25519.Verify(trn.From[:], trn.Contract(currSig), trn.Signature[:])
 }
 
 // Contract returns the bytes that account signs to create a transaction with
 // the private key.
-func (trn Transaction) Contract(ledSig Signature) []byte {
+func (trn Transaction) Contract(currSig Signature) []byte {
 	amount := make([]byte, 4)
 	binary.LittleEndian.PutUint32(amount, trn.Amount)
-	return bytes.Join([][]byte{trn.From[:], trn.To[:], amount, ledSig[:]}, []byte{})
+	return bytes.Join([][]byte{trn.From[:], trn.To[:], amount, currSig[:]}, []byte{})
 }
