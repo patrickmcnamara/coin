@@ -23,16 +23,22 @@ Anyone with the private key has access to the account.
 
 An object containing the public key of the sender account, the public key of the receiver account, the amount of coin to be sent, and the signature from the sender account.
 The data signed in a transaction includes the signature of the previous transaction.
-This is used by the ledger to chain transactions together.
+This is used by the ledger or bank to chain transactions together.
 
 A special case is a genesis transaction. In this type of transaction, the public key of the sender account and receiver account are the same.
-The sending account grants itself an amount of coin. This is the first transaction in a ledger.
+The sending account grants itself an amount of coin. This is the first transaction in a ledger or bank.
 
 ### Ledger
 
 A list of transactions.
 A genesis transaction is first before all other transactions and there is only one.
 Transactions are verified when they are added.
+
+### Bank
+
+A store of balances.
+Unlike the ledger, this does not store transaction information.
+All it does is store balances and the current signature.
 
 ## Installation
 

@@ -14,14 +14,14 @@ type Transaction struct {
 	Signature Signature `json:"signature"`
 }
 
-// Sign signs the transaction with the private key of the sender and the current
-// signature of the ledger.
+// Sign signs the transaction with the private key of the sender and the
+// signature of the ledger or bank.
 func (trn *Transaction) Sign(prvKey PrivateKey, ledSig Signature) {
 	trn.Signature = signatureConv(ed25519.Sign(prvKey[:], trn.Contract(ledSig)))
 }
 
 // Verify verifies the signature of the transaction with the public key of the
-// sender and the current signature of the ledger.
+// sender and the signature of the ledger or bank.
 func (trn Transaction) Verify(ledSig Signature) bool {
 	return ed25519.Verify(trn.From[:], trn.Contract(ledSig), trn.Signature[:])
 }

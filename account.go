@@ -47,15 +47,15 @@ func (acc Account) Verify(data []byte, sig Signature) bool {
 }
 
 // NewGenesisTransaction creates a new transaction where the account grants
-// itself an amount of coin. This must be the first transaction in a ledger and
-// will be invalid otherwise.
+// itself an amount of coin. This must be the first transaction in a ledger
+// or bank and will be invalid otherwise.
 func (acc Account) NewGenesisTransaction(amount uint32) Transaction {
 	return acc.NewTransaction(acc.PublicKey, amount, Signature{})
 }
 
 // NewTransaction creates a new transaction where an account send an amount of
 // coin to another account, addressed by their respective public keys. It is
-// signed by the private key of the sender. The current signature of the ledger
+// signed by the private key of the sender. The signature of the ledger or bank
 // that the transaction is to be added to is also required.
 func (acc Account) NewTransaction(pubKey PublicKey, amount uint32, ledSig Signature) Transaction {
 	trn := Transaction{
